@@ -1,9 +1,9 @@
 import Layout from '@/shared/components/ui/Layout';
-import LoginCard from '@/shared/components/ui/LoginCard';
+import LoginCard from '@/features/auth/components/LoginCard';
 
 const LoginScreen = () => {
   return (
-    <Layout className="auth-screen">
+    <Layout>
       <LoginCard />
     </Layout>
   );
