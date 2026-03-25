@@ -1,15 +1,17 @@
-import './App.css';
-import Layout from '@/shared/components/ui/Layout';
+import { Navigate, Route, Routes } from 'react-router-dom';
+import LoginScreen from '@/features/auth/screens/LoginScreen';
+import RecoverPasswordScreen from '@/features/auth/screens/RecoverPasswordScreen';
+import RegisterScreen from '@/features/auth/screens/RegisterScreen';
 
 function App() {
   return (
-    <section>
-      <Layout className="items-center justify-center">
-        <div className="text-center text-white">
-          <h1>Memory Game</h1>
-        </div>
-      </Layout>
-    </section>
+    <Routes>
+      <Route path="/" element={<Navigate to="/login" replace />} />
+      <Route path="/login" element={<LoginScreen />} />
+      <Route path="/recover-password" element={<RecoverPasswordScreen />} />
+      <Route path="/register" element={<RegisterScreen />} />
+      <Route path="*" element={<Navigate to="/login" replace />} />
+    </Routes>
   );
 }
 
