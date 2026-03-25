@@ -1,26 +1,27 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { Eye, EyeOff } from 'lucide-react';
 import { Link } from 'react-router-dom';
+
 import logo from '@/assets/logo.png';
-
-import {
-  loginWithCredentials,
-  persistAuthTokens,
-} from '@/features/auth/services/loginService';
-
-import LoginButton from '@/shared/components/ui/LoginButton';
+import Button from '@/shared/components/ui/Button';
+import PasswordVisibilityButton from '@/shared/components/ui/PasswordVisibilityButton';
+import { useAuth } from '@/shared/context/userContext';
 
 type LoginFormValues = {
   email: string;
   password: string;
 };
 
-const invalidCredentialsMessage = 'usuario o contraseña incorrecta';
+const invalidCredentialsMessage = 'usuario o contrasena incorrecta';
 
-const LoginCard = () => {
+type LoginCardProps = {
+  onSuccess?: () => void;
+};
+
+const LoginCard = ({ onSuccess }: LoginCardProps) => {
   const [showPassword, setShowPassword] = useState(false);
   const [serverError, setServerError] = useState('');
+  const { login } = useAuth();
   const {
     register,
     handleSubmit,
@@ -36,7 +37,7 @@ const LoginCard = () => {
   const onSubmit = async (values: LoginFormValues) => {
     setServerError('');
 
-    const result = await loginWithCredentials({
+    const result = await login({
       email: values.email.trim(),
       password: values.password,
     });
@@ -47,17 +48,16 @@ const LoginCard = () => {
         return;
       }
 
-      setServerError('No se pudo iniciar sesión');
+      setServerError('No se pudo iniciar sesion');
       return;
     }
-
-    persistAuthTokens(result.data);
 
     reset({
       email: values.email,
       password: '',
     });
     setShowPassword(false);
+    onSuccess?.();
   };
 
   return (
@@ -96,7 +96,7 @@ const LoginCard = () => {
 
           <label className="block space-y-2.5">
             <span className="block text-xl font-bold text-[#2f3f56]">
-              Contraseña
+              Contrasena
             </span>
             <div className="relative">
               <input
@@ -104,19 +104,16 @@ const LoginCard = () => {
                 className="h-16 w-full rounded-2xl border-[3px] border-[#26344b] bg-transparent px-6 pr-16 text-xl text-[#1f3247] transition outline-none focus:border-[#1f3247] focus:ring-4 focus:ring-[#19a7b866]"
                 type={showPassword ? 'text' : 'password'}
                 {...register('password', {
-                  required: 'Ingresa tu contraseña',
+                  required: 'Ingresa tu contrasena',
                 })}
               />
-              <button
-                aria-label={
-                  showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'
-                }
-                className="absolute top-1/2 right-5 -translate-y-1/2 text-[#3d4f69] transition hover:text-[#1f3247] focus-visible:rounded-md focus-visible:ring-2 focus-visible:ring-[#19a7b8] focus-visible:outline-none"
-                type="button"
-                onClick={() => setShowPassword((current) => !current)}
-              >
-                {showPassword ? <EyeOff size={36} /> : <Eye size={36} />}
-              </button>
+              <PasswordVisibilityButton
+                className="absolute top-1/2 right-5 -translate-y-1/2"
+                hiddenLabel="Mostrar contrasena"
+                onToggle={() => setShowPassword((current) => !current)}
+                visible={showPassword}
+                visibleLabel="Ocultar contrasena"
+              />
             </div>
             {errors.password ? (
               <span className="block text-base font-semibold text-red-600">
@@ -125,25 +122,19 @@ const LoginCard = () => {
             ) : null}
           </label>
 
-          <LoginButton
+          <Button
             disabled={isSubmitting}
             isLoading={isSubmitting}
             type="submit"
           />
 
           <div className="space-y-4 text-center">
-            <Link
-              className="inline-block text-xl font-semibold text-[#405172] transition hover:text-[#1f3247] hover:underline focus-visible:rounded-sm focus-visible:ring-2 focus-visible:ring-[#19a7b8] focus-visible:outline-none"
-              to="/recover-password"
-            >
-              ¿Olvidaste tu contraseña?
-            </Link>
             <div>
               <Link
-                className="inline-block text-lg font-semibold text-[#405172] transition hover:text-[#1f3247] hover:underline focus-visible:rounded-sm focus-visible:ring-2 focus-visible:ring-[#19a7b8] focus-visible:outline-none"
+                className="inline-block text-xl font-semibold text-[#405172] transition hover:text-[#1f3247] hover:underline focus-visible:rounded-sm focus-visible:ring-2 focus-visible:ring-[#19a7b8] focus-visible:outline-none"
                 to="/register"
               >
-                ¿No tienes cuenta? Regístrate
+                ¿No tienes cuenta? Registrate
               </Link>
             </div>
           </div>

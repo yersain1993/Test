@@ -1,22 +1,13 @@
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import Layout from '@/shared/components/ui/Layout';
+import RegisterCard from '@/features/auth/components/RegisterCard';
 
 const RegisterScreen = () => {
-  return (
-    <Layout className="auth-screen">
-      <section className="auth-panel">
-        <p className="panel-eyebrow">
-          Crear cuenta
-        </p>
-        <h1 className="panel-title">Registrarse</h1>
-        <p className="panel-subtitle">
-          Esta pantalla queda lista para conectar el flujo de registro más adelante.
-        </p>
+  const navigate = useNavigate();
 
-        <Link className="auth-panel__link" to="/login">
-          Volver al inicio de sesión
-        </Link>
-      </section>
+  return (
+    <Layout>
+      <RegisterCard onSuccess={() => navigate('/login', { replace: true })} />
     </Layout>
   );
 };

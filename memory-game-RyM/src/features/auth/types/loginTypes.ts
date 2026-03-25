@@ -3,15 +3,19 @@ export type LoginCredentials = {
   password: string;
 };
 
+export type AuthUser = {
+  email: string;
+};
+
 export type LoginResponse = {
   code?: string;
-  accessToken?: string;
-  refreshToken?: string;
+  message?: string;
+  user?: AuthUser;
 };
 
 export type LoginSuccess = {
-  accessToken?: string;
-  refreshToken?: string;
+  message: string;
+  user: AuthUser;
 };
 
 export type LoginErrorReason = 'invalid_credentials' | 'unknown_error';

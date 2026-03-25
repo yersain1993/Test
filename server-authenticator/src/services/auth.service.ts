@@ -1,4 +1,5 @@
 import { AppError } from "../errors/app-error";
+import type { AuthSession } from "../interfaces/services/auth-service.interface";
 import type { IUserRepository } from "../interfaces/repositories/user-repository.interface";
 import type { IAuthService } from "../interfaces/services/auth-service.interface";
 import type { IPasswordHasher } from "../interfaces/services/password-hasher.interface";
@@ -40,5 +41,19 @@ export class AuthService implements IAuthService {
     }
 
     return this.tokenService.generateTokens({ email: user.email });
+  }
+
+  async refresh(refreshToken: string): Promise<AuthSession> {
+    const payload = this.tokenService.verifyRefreshToken(refreshToken);
+    const user = await this.userRepository.findByEmail(payload.email);
+
+    if (!user) {
+      throw new AppError("Invalid credentials", 403, "INVALID_CREDENTIALS");
+    }
+
+    return {
+      user: { email: user.email },
+      tokens: this.tokenService.generateTokens({ email: user.email })
+    };
   }
 }
