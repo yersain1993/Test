@@ -1,122 +1,83 @@
-import { useState } from 'react';
-import reactLogo from './assets/react.svg';
-import viteLogo from './assets/vite.svg';
-import heroImg from './assets/hero.png';
-import './App.css';
+import type { PropsWithChildren } from 'react';
+import { Navigate, Route, Routes } from 'react-router-dom';
+import LoginScreen from '@/features/auth/screens/LoginScreen';
+import RecoverPasswordScreen from '@/features/auth/screens/RecoverPasswordScreen';
+import RegisterScreen from '@/features/auth/screens/RegisterScreen';
+import GameScreen from '@/features/game/screens/GameScreen';
+import Layout from '@/shared/components/ui/Layout';
+import { useAuth } from '@/shared/context/userContext';
+
+const ProtectedRoute = ({ children }: PropsWithChildren) => {
+  const { isAuthenticated, isLoading } = useAuth();
+
+  if (isLoading) {
+    return (
+      <Layout>
+        <div className="rounded-2xl border-2 border-[#1f3247] bg-[#FFFAC2] px-6 py-4 text-center font-bold text-[#2f3f56] shadow-[0_4px_0_#c8df3f]">
+          Cargando sesión...
+        </div>
+      </Layout>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+
+  return children;
+};
+
+const PublicRoute = ({ children }: PropsWithChildren) => {
+  const { isAuthenticated, isLoading } = useAuth();
+
+  if (isLoading) {
+    return (
+      <Layout>
+        <div className="rounded-2xl border-2 border-[#1f3247] bg-[#FFFAC2] px-6 py-4 text-center font-bold text-[#2f3f56] shadow-[0_4px_0_#c8df3f]">
+          Cargando sesión...
+        </div>
+      </Layout>
+    );
+  }
+
+  if (isAuthenticated) {
+    return <Navigate to="/game" replace />;
+  }
+
+  return children;
+};
 
 function App() {
-  const [count, setCount] = useState(0);
   return (
-    <>
-      <section id="display flex">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <h2 className="text-5xl text-red-200">
-            Click on the Vite logo to learn more
-          </h2>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
+    <Routes>
+      <Route path="/" element={<Navigate to="/game" replace />} />
+      <Route
+        path="/login"
+        element={
+          <PublicRoute>
+            <LoginScreen />
+          </PublicRoute>
+        }
+      />
+      <Route path="/recover-password" element={<RecoverPasswordScreen />} />
+      <Route
+        path="/register"
+        element={
+          <PublicRoute>
+            <RegisterScreen />
+          </PublicRoute>
+        }
+      />
+      <Route
+        path="/game"
+        element={
+          <ProtectedRoute>
+            <GameScreen />
+          </ProtectedRoute>
+        }
+      />
+      <Route path="*" element={<Navigate to="/login" replace />} />
+    </Routes>
   );
 }
 

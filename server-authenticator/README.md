@@ -1,6 +1,6 @@
 # Server Authenticator API
 
-API de autenticacion con JWT para registro, login y lectura del usuario autenticado.
+API de autenticación con JWT y cookies `httpOnly` para registro, login, refresh y lectura del usuario autenticado.
 
 ## Base URL
 
@@ -16,6 +16,12 @@ API de autenticacion con JWT para registro, login y lectura del usuario autentic
   - `REFRESH_TOKEN_EXPIRATION` (opcional, default `7d`)
   - `PORT` (opcional, default `8000`)
   - `CORS_ORIGIN` (opcional, default `*`)
+
+## Sesión
+
+- `POST /api/auth/login` y `POST /api/auth/refresh` establecen cookies `httpOnly`.
+- El frontend debe enviar requests con `credentials: include`.
+- En desarrollo, el middleware acepta tanto cookie `accessToken` como `Authorization: Bearer <token>`.
 
 ## Ejecucion
 
@@ -65,7 +71,7 @@ Errores comunes:
 
 ### `POST /auth/login`
 
-Autentica usuario y retorna tokens.
+Autentica usuario y setea cookies seguras.
 
 Request:
 
@@ -81,8 +87,9 @@ Response `200`:
 ```json
 {
   "message": "Login successful",
-  "accessToken": "<jwt_access_token>",
-  "refreshToken": "<jwt_refresh_token>"
+  "user": {
+    "email": "user@example.com"
+  }
 }
 ```
 
@@ -91,6 +98,38 @@ Errores comunes:
 - `400 VALIDATION_ERROR`
 - `400 INVALID_CREDENTIALS`
 
+### `POST /auth/refresh`
+
+Renueva la sesión usando la cookie `refreshToken` y vuelve a setear ambas cookies.
+
+Response `200`:
+
+```json
+{
+  "message": "Session refreshed",
+  "user": {
+    "email": "user@example.com"
+  }
+}
+```
+
+Errores comunes:
+
+- `401 AUTH_TOKEN_MISSING`
+- `403 AUTH_TOKEN_INVALID`
+
+### `POST /auth/logout`
+
+Cierra la sesión y borra las cookies de autenticación.
+
+Response `200`:
+
+```json
+{
+  "message": "Logout successful"
+}
+```
+
 ### `GET /user`
 
 Retorna el usuario autenticado actual.
@@ -98,21 +137,22 @@ Retorna el usuario autenticado actual.
 Headers:
 
 ```http
-Authorization: Bearer <accessToken>
+Cookie: accessToken=<jwt_access_token>
 ```
 
 Response `200`:
 
 ```json
 {
-  "email": "user@example.com"
+  "user": {
+    "email": "user@example.com"
+  }
 }
 ```
 
 Errores comunes:
 
 - `401 AUTH_TOKEN_MISSING`
-- `401 AUTH_TOKEN_MALFORMED`
 - `403 AUTH_TOKEN_INVALID`
 
 ## Formato de errores
@@ -155,10 +195,16 @@ curl -X POST "http://localhost:8000/api/auth/login" \
   -d "{\"email\":\"user@example.com\",\"password\":\"Password123\"}"
 ```
 
+Refresh:
+
+```bash
+curl -X POST "http://localhost:8000/api/auth/refresh" \
+  -H "Content-Type: application/json"
+```
+
 Usuario autenticado:
 
 ```bash
 curl "http://localhost:8000/api/user" \
-  -H "Authorization: Bearer <accessToken>"
+  -H "Cookie: accessToken=<jwt_access_token>"
 ```
-

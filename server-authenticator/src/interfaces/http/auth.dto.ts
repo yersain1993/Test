@@ -1,3 +1,7 @@
+export interface AuthUser {
+  email: string;
+}
+
 export interface RegisterRequestBody {
   email?: string;
   password?: string;
@@ -8,8 +12,16 @@ export interface LoginRequestBody {
   password?: string;
 }
 
-export interface AuthResponse {
+export interface LoginResponse {
   message: string;
-  accessToken: string;
-  refreshToken: string;
+  user: AuthUser;
+}
+
+export interface RefreshResponse {
+  message: string;
+  user: AuthUser;
+}
+
+export interface LogoutResponse {
+  message: string;
 }
