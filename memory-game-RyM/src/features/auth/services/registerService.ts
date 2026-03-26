@@ -4,7 +4,7 @@ import type {
   RegisterResponse,
   RegisterSuccess,
 } from '@/features/auth/types/registerTypes';
-import { apiClient } from '@/features/api/axiosInstance';
+import { apiClient } from '@/features/auth/api/axiosInstance';
 import { mapRegisterErrorReason } from '../utils/errorHandler';
 
 export type RegisterResult =
@@ -15,7 +15,10 @@ export const registerUser = async (
   credentials: RegisterCredentials
 ): Promise<RegisterResult> => {
   try {
-    const response = await apiClient.post<RegisterResponse>("/auth/register", credentials);
+    const response = await apiClient.post<RegisterResponse>(
+      '/auth/register',
+      credentials
+    );
     const data = response.data ?? {};
 
     return {
