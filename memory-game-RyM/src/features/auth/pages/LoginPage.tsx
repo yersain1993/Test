@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import Layout from '@/shared/components/ui/Layout';
 import LoginCard from '@/features/auth/components/LoginCard';
 
-const LoginScreen = () => {
+const LoginPage = () => {
   const navigate = useNavigate();
 
   return (
@@ -12,4 +12,4 @@ const LoginScreen = () => {
   );
 };
 
-export default LoginScreen;
+export default LoginPage;

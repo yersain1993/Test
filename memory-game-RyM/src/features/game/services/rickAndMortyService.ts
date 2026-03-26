@@ -19,8 +19,8 @@ const GET_CHARACTERS_QUERY = `
 `;
 
 export const fetchCharacters = async (
-  page = 1,
-  limit = 6
+  page: number,
+  limit: number
 ): Promise<Character[]> => {
   const { data } = await axios.post<{
     data: { characters: { results: Character[] } };

@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import Layout from '@/shared/components/ui/Layout';
 
-const RecoverPasswordScreen = () => {
+const RecoverPasswordPage = () => {
   return (
     <Layout className="auth-screen">
       <section className="auth-panel">
@@ -21,4 +21,4 @@ const RecoverPasswordScreen = () => {
   );
 };
 
-export default RecoverPasswordScreen;
+export default RecoverPasswordPage;

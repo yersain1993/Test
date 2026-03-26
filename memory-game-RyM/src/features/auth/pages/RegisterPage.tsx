@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import Layout from '@/shared/components/ui/Layout';
 import RegisterCard from '@/features/auth/components/RegisterCard';
 
-const RegisterScreen = () => {
+const RegisterPage = () => {
   const navigate = useNavigate();
 
   return (
@@ -12,4 +12,4 @@ const RegisterScreen = () => {
   );
 };
 
-export default RegisterScreen;
+export default RegisterPage;

@@ -25,10 +25,10 @@ This document is for agents working in `memory-game-RyM`.
 - `src/assets/`: imported assets such as the logo.
 
 ## Auth architecture
-- `LoginScreen` and `RegisterScreen` are route entry points.
-- Screens should compose `Layout` with a feature card component.
+- `LoginPage` and `RegisterPage` are route entry points.
+- Pages should compose `Layout` with a feature card component.
 - `LoginCard` and `RegisterCard` contain the form UI and local form logic.
-- `GameScreen` is the authenticated landing page after login.
+- `GamePage` is the authenticated landing page after login.
 - API calls must live in `src/features/auth/services/`.
 - Validation schemas must live in `src/features/auth/schemas/`.
 - Shared visual primitives should stay in `src/shared/components/ui/`.
@@ -70,7 +70,7 @@ Expected auth base URL:
 ## Naming conventions
 - Feature folders follow screaming architecture by domain.
 - Use `*Card.tsx` for form containers.
-- Use `*Screen.tsx` for route-level components.
+- Use `*Page.tsx` for route-level components.
 - Use `*Service.ts` for API interaction.
 - Use `*Schema.ts` for Zod schemas.
 - Use `*Types.ts` for DTOs and result types.
