@@ -1,5 +1,6 @@
 import type { AuthUser } from "../types/loginTypes";
 import { apiClient } from "@/features/api/axiosInstance";
+import { isExpectedSessionError } from "../utils/errorHandler";
 
 export type SessionResult =
   | AuthUser | undefined
@@ -16,15 +17,24 @@ export const refreshSession = async (): Promise<SessionResult> => {
     const user = data.user;
 
     return user;
-  } catch(error) {
+  } catch (error) {
+    if (isExpectedSessionError(error)) {
+      return undefined;
+    }
+
     console.error("Error refreshing session:", error);
+    return undefined;
   }
 };
 
 export const logoutSession = async (): Promise<void> => {
   try {
     await apiClient.post("/auth/logout");
-  } catch(error) {
+  } catch (error) {
+    if (isExpectedSessionError(error)) {
+      return;
+    }
+
     console.error("Error logging out:", error);
   }
 };
