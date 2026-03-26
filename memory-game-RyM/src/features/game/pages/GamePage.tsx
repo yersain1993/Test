@@ -3,9 +3,9 @@ import Button from '@/shared/components/ui/Button';
 import { useEffect, useState } from 'react';
 import { fetchCharacters } from '../services/rickAndMortyService';
 import type { Character } from '../types/character';
-import CharacterCard from '../components/CharacterCard';
+import GridCard from '../components/GridCard';
 
-const GameScreen = () => {
+const GamePage = () => {
   const [characters, setCharacters] = useState<Character[]>([]);
 
   const handlePlay = async () => {
@@ -29,15 +29,16 @@ const GameScreen = () => {
     LoadData();
   }, []);
 
-  console.log(characters);
-
   return (
     <Layout>
-      <section className="w-full max-w-3xl rounded-[28px] border-2 border-[#1f3247] bg-[#FFFAC2] px-6 py-8 text-center shadow-[0_6px_0_#c8df3f] sm:px-10 sm:py-12">
-        <CharacterCard character={characters[0]} />
-
+      <section className="w-full max-w-260 rounded-[28px] border-2 border-[#1f3247] bg-[#FFFAC2] px-6 py-8 text-center shadow-[0_6px_0_#c8df3f] sm:px-10 sm:py-12 md:max-h-265.25 lg:max-h-265.25">
+        <GridCard characters={characters} />
         <div className="mt-8 flex justify-center">
-          <Button className="px-8" onClick={handlePlay} type="button">
+          <Button
+            className="w-2/5 px-8 sm:w-2/6 md:w-2/6 lg:w-1/5"
+            onClick={handlePlay}
+            type="button"
+          >
             Jugar
           </Button>
         </div>
@@ -46,4 +47,4 @@ const GameScreen = () => {
   );
 };
 
-export default GameScreen;
+export default GamePage;

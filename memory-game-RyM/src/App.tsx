@@ -1,9 +1,9 @@
 import type { PropsWithChildren } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
-import LoginScreen from '@/features/auth/screens/LoginScreen';
-import RecoverPasswordScreen from '@/features/auth/screens/RecoverPasswordScreen';
-import RegisterScreen from '@/features/auth/screens/RegisterScreen';
-import GameScreen from '@/features/game/screens/GameScreen';
+import LoginPage from '@/features/auth/pages/LoginPage';
+import RecoverPasswordPage from '@/features/auth/pages/RecoverPasswordPage';
+import RegisterPage from '@/features/auth/pages/RegisterPage';
+import GamePage from '@/features/game/pages/GamePage';
 import Layout from '@/shared/components/ui/Layout';
 import { useAuth } from '@/shared/context/userContext';
 
@@ -55,16 +55,16 @@ function App() {
         path="/login"
         element={
           <PublicRoute>
-            <LoginScreen />
+            <LoginPage />
           </PublicRoute>
         }
       />
-      <Route path="/recover-password" element={<RecoverPasswordScreen />} />
+      <Route path="/recover-password" element={<RecoverPasswordPage />} />
       <Route
         path="/register"
         element={
           <PublicRoute>
-            <RegisterScreen />
+            <RegisterPage />
           </PublicRoute>
         }
       />
@@ -72,7 +72,7 @@ function App() {
         path="/game"
         element={
           <ProtectedRoute>
-            <GameScreen />
+            <GamePage />
           </ProtectedRoute>
         }
       />

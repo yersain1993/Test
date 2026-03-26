@@ -11,6 +11,8 @@ export interface Card {
   characterId: string;
   name: string;
   image: string;
+  status: string;
+  species: string;
   isFlipped: boolean;
   isMatched: boolean;
 }
