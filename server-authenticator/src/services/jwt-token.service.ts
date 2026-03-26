@@ -30,15 +30,7 @@ export class JwtTokenService implements ITokenService {
   }
 
   verifyAccessToken(token: string): AuthenticatedUser {
-    return this.verifyToken(token, this.config.accessSecret);
-  }
-
-  verifyRefreshToken(token: string): AuthenticatedUser {
-    return this.verifyToken(token, this.config.refreshSecret);
-  }
-
-  private verifyToken(token: string, secret: string): AuthenticatedUser {
-    const decoded = jwt.verify(token, secret);
+    const decoded = jwt.verify(token, this.config.accessSecret);
 
     if (typeof decoded !== "object" || decoded === null || typeof decoded.email !== "string") {
       throw new AppError("Invalid token payload", 403, "AUTH_TOKEN_INVALID");

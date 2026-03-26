@@ -6,13 +6,17 @@ export class AuthMiddleware {
   constructor(private readonly tokenService: ITokenService) {}
 
   handle = (req: Request, _res: Response, next: NextFunction): void => {
-    const cookieToken = req.cookies?.accessToken as string | undefined;
     const authorization = req.headers.authorization;
-    const bearerToken = this.extractBearerToken(authorization);
-    const token = cookieToken ?? bearerToken;
 
-    if (!token) {
+    if (!authorization) {
       next(new AppError("No token provided", 401, "AUTH_TOKEN_MISSING"));
+      return;
+    }
+
+    const [scheme, token] = authorization.split(" ");
+
+    if (scheme !== "Bearer" || !token) {
+      next(new AppError("Malformed authorization header", 401, "AUTH_TOKEN_MALFORMED"));
       return;
     }
 
@@ -24,18 +28,4 @@ export class AuthMiddleware {
       next(new AppError("Invalid or expired token", 403, "AUTH_TOKEN_INVALID"));
     }
   };
-
-  private extractBearerToken(authorization: string | undefined): string | undefined {
-    if (!authorization) {
-      return undefined;
-    }
-
-    const [scheme, token] = authorization.split(" ");
-
-    if (scheme !== "Bearer" || !token) {
-      return undefined;
-    }
-
-    return token;
-  }
 }
