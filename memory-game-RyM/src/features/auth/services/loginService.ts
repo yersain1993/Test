@@ -1,50 +1,34 @@
-import type { LoginCredentials, LoginErrorReason, LoginResponse, LoginSuccess } from "../types/loginTypes";
-
+import type {
+  LoginCredentials,
+  LoginErrorReason,
+  LoginResponse,
+  LoginSuccess,
+} from '../types/loginTypes';
+import { apiClient } from '@/features/auth/api/axiosInstance';
+import { mapLoginErrorReason } from '../utils/errorHandler';
 
 export type LoginResult =
   | { ok: true; data: LoginSuccess }
   | { ok: false; reason: LoginErrorReason };
 
-const LOGIN_URL = import.meta.env.VITE_AUTH_API_URL ?? 'http://localhost:8000/api/auth/login';
-
-export const loginWithCredentials = async (credentials: LoginCredentials): Promise<LoginResult> => {
+export const loginWithCredentials = async (
+  credentials: LoginCredentials
+): Promise<LoginResult> => {
   try {
-    const response = await fetch(LOGIN_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(credentials),
-    });
-
-    const data = (await response.json().catch(() => ({}))) as LoginResponse;
-
-    if (!response.ok) {
-      if (data.code === 'INVALID_CREDENTIALS' || response.status === 400) {
-        return { ok: false, reason: 'invalid_credentials' };
-      }
-
-      return { ok: false, reason: 'unknown_error' };
-    }
+    const response = await apiClient.post<LoginResponse>(
+      '/auth/login',
+      credentials
+    );
+    const data = response.data ?? {};
 
     return {
       ok: true,
       data: {
-        accessToken: data.accessToken,
-        refreshToken: data.refreshToken,
+        message: data.message ?? 'Login successful',
+        user: data.user ?? { email: credentials.email.trim() },
       },
     };
-  } catch {
-    return { ok: false, reason: 'unknown_error' };
-  }
-};
-
-export const persistAuthTokens = ({ accessToken, refreshToken }: LoginSuccess) => {
-  if (accessToken) {
-    localStorage.setItem('auth.accessToken', accessToken);
-  }
-
-  if (refreshToken) {
-    localStorage.setItem('auth.refreshToken', refreshToken);
+  } catch (error) {
+    return { ok: false, reason: mapLoginErrorReason(error) };
   }
 };

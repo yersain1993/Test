@@ -8,4 +8,5 @@ export interface AuthTokens {
 export interface ITokenService {
   generateTokens(payload: AuthenticatedUser): AuthTokens;
   verifyAccessToken(token: string): AuthenticatedUser;
+  verifyRefreshToken(token: string): AuthenticatedUser;
 }
