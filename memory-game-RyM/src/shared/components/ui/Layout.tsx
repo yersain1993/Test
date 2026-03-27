@@ -1,8 +1,7 @@
 import { mergeClassNames } from '@/shared/utils';
 import headerLogo from '@/assets/header.svg';
 import type { PropsWithChildren } from 'react';
-import { useAuth } from '@/shared/context/userContext';
-import Button from './Button';
+import { useAuth } from '@/features/auth/context/userContext';
 
 type LayoutProps = PropsWithChildren<{
   className?: string;
@@ -21,13 +20,6 @@ const Layout = ({ children, className = '' }: LayoutProps) => {
       {isAuthenticated && (
         <div className="mb-7 flex items-center justify-center">
           <img src={headerLogo} alt="Header" className="h-55 w-[519.69px]" />
-          {/* <button className="absolute top-53 right-10">
-            <span className='flex bg-[#A2F2F9] items-center justify-center gap-2 py-2 px-3 rounded-2xl'>
-              <LogOut className='text-[#233A59]'/>
-              <h1 className='text-[#233A59]'>Log Out</h1>
-            </span>
-          </button> */}
-          <Button>Log Out</Button>
         </div>
       )}
       <main>{children}</main>

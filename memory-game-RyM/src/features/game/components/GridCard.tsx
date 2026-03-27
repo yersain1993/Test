@@ -1,50 +1,41 @@
-import { useCharacters } from '../hooks/useCharacters';
+import Button from '@/shared/components/ui/Button';
 import { useGameStore } from '../store/useGameStore';
-import type { Character } from '../types/character';
-import BackCharacterCard from './game-card/BackCharacterCard';
 import CharacterCard from './game-card/CharacterCard';
+import GameOver from './GameOver';
 
 type GridCardProps = {
-  characters: Character[];
+  isLoading: boolean;
+  error: string | null;
+  startGame: () => void;
 };
 
-export default function GridCard({ characters }: GridCardProps) {
-  const { isLoading, error, retry } = useCharacters();
-  const { turns, matches, status } = useGameStore();
+export default function GridCard({ isLoading, startGame }: GridCardProps) {
+  const cards = useGameStore((s) => s.cards);
+  const status = useGameStore((s) => s.status);
 
-  if (isLoading)
+  if (isLoading) {
     return (
-      <div className="">
-        <BackCharacterCard />
+      <div className="flex h-72 items-center justify-center">
+        <p className="text-xl">Cargando personajes...</p>
       </div>
     );
-  if (error)
-    return (
-      <div className="flex h-72 w-53 items-center justify-center rounded bg-red-200">
-        Error al cargar.{' '}
-        <button
-          onClick={retry}
-          className="ml-2 rounded bg-red-500 px-2 py-1 text-white"
-        >
-          Reintentar
-        </button>
-      </div>
-    );
-  if (status === 'finished')
-    return (
-      <div className="flex h-72 w-53 items-center justify-center rounded bg-green-200">
-        ¡Juego terminado! Turns: {turns}, Matches: {matches}
-      </div>
-    );
+  }
+
+  if (status === 'finished') {
+    return <GameOver />;
+  }
 
   return (
     <section className="h-auto w-full">
-      <h2 className="w-full text-start text-2xl font-bold">Personajes</h2>
-      <main className="grid grid-cols-1 justify-items-center gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-        {characters.map((char: Character) => (
-          <CharacterCard key={char.id} character={char} />
+      <h2 className='font-bold text-[24px] text-start'>Personajes</h2>
+      <main className="grid grid-cols-1 justify-items-center gap-4 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4">
+        {cards.map((card) => (
+          <CharacterCard key={card.uid} card={card} />
         ))}
       </main>
+      <Button variant="play" className='mt-2' onClick={startGame}>
+        Inicio
+      </Button>
     </section>
   );
 }
