@@ -1,7 +1,6 @@
 import type { PropsWithChildren } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import LoginPage from '@/features/auth/pages/LoginPage';
-import RecoverPasswordPage from '@/features/auth/pages/RecoverPasswordPage';
 import RegisterPage from '@/features/auth/pages/RegisterPage';
 import GamePage from '@/features/game/pages/GamePage';
 import Layout from '@/shared/components/ui/Layout';
@@ -60,7 +59,6 @@ function App() {
           </PublicRoute>
         }
       />
-      <Route path="/recover-password" element={<RecoverPasswordPage />} />
       <Route
         path="/register"
         element={
