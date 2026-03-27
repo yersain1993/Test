@@ -2,6 +2,7 @@ import Button from '@/shared/components/ui/Button';
 import { useGameStore } from '../store/useGameStore';
 import CharacterCard from './game-card/CharacterCard';
 import GameOver from './GameOver';
+import Loader from '../../../shared/components/ui/Loader';
 
 type GridCardProps = {
   isLoading: boolean;
@@ -13,10 +14,12 @@ export default function GridCard({ isLoading, startGame }: GridCardProps) {
   const cards = useGameStore((s) => s.cards);
   const status = useGameStore((s) => s.status);
 
+  const isPlayed = status === 'playing' ? "disabled" : "play";
+
   if (isLoading) {
     return (
       <div className="flex h-72 items-center justify-center">
-        <p className="text-xl">Cargando personajes...</p>
+        <Loader />
       </div>
     );
   }
@@ -24,6 +27,7 @@ export default function GridCard({ isLoading, startGame }: GridCardProps) {
   if (status === 'finished') {
     return <GameOver />;
   }
+  console.log(status);
 
   return (
     <section className="h-auto w-full">
@@ -33,7 +37,7 @@ export default function GridCard({ isLoading, startGame }: GridCardProps) {
           <CharacterCard key={card.uid} card={card} />
         ))}
       </main>
-      <Button variant="play" className='mt-2' onClick={startGame}>
+      <Button variant={isPlayed} className='mt-2' onClick={startGame}>
         Inicio
       </Button>
     </section>

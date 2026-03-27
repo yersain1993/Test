@@ -2,7 +2,7 @@ import {
   FlipCard,
   FlipCardBack,
   FlipCardFront,
-} from '../../animations/FlipAnimation';
+} from '../../animations/cards-animations/FlipAnimation';
 import { useGameStore } from '../../store/useGameStore';
 import type { Card } from '../../types/character';
 import BackCharacterCard from './BackCharacterCard';
