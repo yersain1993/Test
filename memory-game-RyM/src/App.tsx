@@ -33,8 +33,8 @@ const PublicRoute = ({ children }: PropsWithChildren) => {
   if (isLoading) {
     return (
       <Layout>
-        <div className="rounded-2xl border-2 border-[#1f3247] bg-[#FFFAC2] px-6 py-4 text-center font-bold text-[#2f3f56] shadow-[0_4px_0_#c8df3f]">
-          Cargando sesión...
+        <div className="rounded-2xl border-2 border-[#1f3247] bg-[#FFFAC2] px-6 py-4 font-bold shadow-[0_4px_0_#c8df3f]">
+          <Loader/>
         </div>
       </Layout>
     );
