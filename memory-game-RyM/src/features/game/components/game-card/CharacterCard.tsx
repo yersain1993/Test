@@ -2,25 +2,37 @@ import {
   FlipCard,
   FlipCardBack,
   FlipCardFront,
-} from '../../animations/FlipAnimation';
-import type { Character } from '../../types/character';
+} from '../../animations/cards-animations/FlipAnimation';
+import { useGameStore } from '../../store/useGameStore';
+import type { Card } from '../../types/character';
 import BackCharacterCard from './BackCharacterCard';
 import FrontCharacterCard from './FrontCharacterCard';
 
 type CharacterCardProps = {
-  character: Character;
+  card: Card;
 };
 
-const flipAnimationClass = true;
+export default function CharacterCard({ card }: CharacterCardProps) {
+  const flipCard = useGameStore((s) => s.flipCard);
+  const status = useGameStore((s) => s.status);
 
-export default function CharacterCard({ character }: CharacterCardProps) {
+  const handleClick = () => {
+    if (status !== 'playing' || card.isMatched) return;
+    flipCard(card.uid);
+  };
+
+  const showFace = status === 'preview' || card.isFlipped;
+
+  console.log(status, card.isFlipped, card.isMatched);
+
   return (
     <FlipCard
-      isFlipped={flipAnimationClass}
+      isFlipped={!showFace}
       className="relative h-72 w-53 cursor-pointer"
+      onClick={handleClick}
     >
       <FlipCardFront>
-        <FrontCharacterCard character={character} />
+        <FrontCharacterCard card={card} />
       </FlipCardFront>
       <FlipCardBack>
         <BackCharacterCard />

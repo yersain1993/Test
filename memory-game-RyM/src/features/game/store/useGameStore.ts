@@ -1,72 +1,81 @@
-import { create } from "zustand";
-import type { Character } from "../types/character";
-import type {Card, GameStatus} from "@/features/game/types/character";
-import { buildShuffledCards } from "../utils/buildShuffleCards";
+import { create } from 'zustand';
+import type { Character, Card, GameStatus } from '../types/character';
+import { buildShuffledCards } from '../utils/buildShuffleCards';
 
-export interface GameState {
-    //State
-    cards: Card[];
-    flippedCards: Card[];
-    turns: number;
-    matches: number;
-    status: GameStatus;
+interface GameState {
+  characters: Character[];
+  cards: Card[];
+  flippedCards: string[];
+  turns: number;
+  matches: number;
+  status: GameStatus;
 
-    //Actions
-    initGame: (characters: Character[]) => void;
-    flipCard: (uid: string) => void;
-    resetGame: () => void;
-    setStatus: (status: GameStatus) => void;
+  initGame: (characters: Character[]) => void;
+  startGame: () => void;
+  flipCard: (uid: string) => void;
+  resetGame: () => void;
+  setStatus: (status: GameStatus) => void;
 }
 
 export const useGameStore = create<GameState>((set, get) => ({
+  characters: [],
   cards: [],
   flippedCards: [],
   turns: 0,
   matches: 0,
-  status: "idle",
+  status: 'idle',
 
   initGame: (characters) => {
     set({
+      characters,
       cards: buildShuffledCards(characters),
       flippedCards: [],
       turns: 0,
       matches: 0,
-      status: "preview", // inicia mostrando las cartas 3s
+      status: 'idle',
     });
   },
 
-  flipCard: (uid) => {
-    const { cards, flippedCards, turns, matches } = get();
+  startGame: () => {
+    const { setStatus } = get();
+    setStatus('preview');
+    setTimeout(() => setStatus('playing'), 3000);
+  },
 
-    // Bloquear si ya hay 2 cartas volteadas o la carta ya está matched
+  flipCard: (uid) => {
+    const { cards, flippedCards, status } = get();
+    if (status !== 'playing') return;
+
     const card = cards.find((c) => c.uid === uid);
-    if (!card || card.isMatched || card.isFlipped || flippedCards.length === 2) return;
+    if (!card || card.isMatched || card.isFlipped || flippedCards.length === 2)
+      return;
 
     const updatedCards = cards.map((c) =>
       c.uid === uid ? { ...c, isFlipped: true } : c
     );
-    const newFlipped = [...flippedCards, { ...card, isFlipped: true }];
+    const newFlipped = [...flippedCards, uid];
 
     set({ cards: updatedCards, flippedCards: newFlipped });
 
-    // Evaluar par cuando hay 2 cartas
     if (newFlipped.length === 2) {
-      const [first, second] = newFlipped;
+      const [firstUid, secondUid] = newFlipped;
+      const first = updatedCards.find((c) => c.uid === firstUid)!;
+      const second = updatedCards.find((c) => c.uid === secondUid)!;
       const isMatch = first.characterId === second.characterId;
 
       setTimeout(() => {
         set((state) => {
-          const newMatches = isMatch ? matches + 1 : matches;
+          const newMatches = isMatch ? state.matches + 1 : state.matches;
           const totalPairs = state.cards.length / 2;
 
           return {
-            turns: turns + 1,
+            turns: state.turns + 1,
             matches: newMatches,
             flippedCards: [],
-            status: newMatches === totalPairs ? "finished" : "playing",
+            status: newMatches === totalPairs ? 'finished' : 'playing',
             cards: state.cards.map((c) =>
-              c.uid === first.uid || c.uid === second.uid
-                ? { ...c, isFlipped: isMatch ? true : false, isMatched: isMatch }
+              c.uid === firstUid || c.uid === secondUid
+                ? { ...c, isFlipped: isMatch, isMatched: isMatch }
                 : c
             ),
           };
@@ -76,33 +85,15 @@ export const useGameStore = create<GameState>((set, get) => ({
   },
 
   resetGame: () => {
-    const { cards } = get();
-    // Reconstruimos con los mismos personajes pero barajados de nuevo
-    const uniqueChars = Object.values(
-      cards.reduce((acc, card) => {
-        if (!acc[card.characterId]) {
-          acc[card.characterId] = {
-            id: card.characterId,
-            name: card.name,
-            image: card.image,
-            status: card.status,
-            species: card.species,
-          };
-        }
-        return acc;
-      }, {} as Record<string, { id: string; name: string; image: string; status: string; species: string }>)
-    );
-
+    const { characters } = get();
     set({
-      cards: buildShuffledCards(uniqueChars),
+      cards: buildShuffledCards(characters),
       flippedCards: [],
       turns: 0,
       matches: 0,
-      status: "preview",
+      status: 'idle',
     });
   },
 
   setStatus: (status) => set({ status }),
 }));
-
-

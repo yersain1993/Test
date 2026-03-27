@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import logo from '@/assets/logo.png';
 import Button from '@/shared/components/ui/Button';
 import PasswordVisibilityButton from '@/shared/components/ui/PasswordVisibilityButton';
-import { useAuth } from '@/shared/context/userContext';
+import { useAuth } from '@/features/auth/context/userContext';
 
 type LoginFormValues = {
   email: string;
@@ -125,7 +125,8 @@ const LoginCard = ({ onSuccess }: LoginCardProps) => {
           <Button
             disabled={isSubmitting}
             isLoading={isSubmitting}
-            type="submit"
+            className='w-full'
+            variant="submit"
           />
 
           <div className="space-y-4 text-center">

@@ -1,6 +1,6 @@
 import * as React from "react"
 import { motion } from "framer-motion"
-import { flipVariants, flipTransition } from "@/features/game/animations/presets"
+import { flipVariants, flipTransition } from "@/features/game/animations/cards-animations/presets"
 import { mergeClassNames } from "@/shared/utils"
 
 const FlipCard = React.forwardRef<

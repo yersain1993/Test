@@ -175,10 +175,10 @@ const RegisterCard = ({ onSuccess }: RegisterCardProps) => {
           </label>
 
           <Button
-            className="h-12 rounded-xl px-6 text-base tracking-[0.12em] sm:text-lg"
+            className="h-12 w-full rounded-xl px-6 text-base tracking-[0.12em] sm:text-lg"
             disabled={isSubmitting}
             isLoading={isSubmitting}
-            type="submit"
+            variant="submit"
           >
             Crear cuenta
           </Button>

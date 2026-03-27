@@ -7,7 +7,7 @@ export interface Character {
 }
 
 export interface Card {
-  uid: string;        // único por carta (id + "_a" o "_b")
+  uid: string;
   characterId: string;
   name: string;
   image: string;

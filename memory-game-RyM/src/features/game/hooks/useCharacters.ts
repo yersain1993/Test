@@ -1,42 +1,35 @@
-import { useEffect, useState } from "react";
-import { fetchCharacters } from "@/features/game/services/rickAndMortyService";
-import { useGameStore } from "@/features/game/store/useGameStore";
+import { useCallback, useEffect, useState } from 'react';
+import { fetchCharacters } from '@/features/game/services/rickAndMortyService';
+import { useGameStore } from '@/features/game/store/useGameStore';
 
 interface UseCharactersReturn {
   isLoading: boolean;
   error: string | null;
-  retry: () => void;
+  startGame: () => void;
 }
 
 export const useCharacters = (): UseCharactersReturn => {
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);  // inicia cargando
   const [error, setError] = useState<string | null>(null);
   const initGame = useGameStore((s) => s.initGame);
-  const setStatus = useGameStore((s) => s.setStatus);
+  const startGame = useGameStore((s) => s.startGame);
 
-  const load = async () => {
+  const load = useCallback(async () => {
     setIsLoading(true);
     setError(null);
-
     try {
-      const characters = await fetchCharacters(
-        Math.floor(Math.random() * 5) + 1, // página random para variedad
-        6
-      );
-      initGame(characters);
-
-      // Preview 3 segundos → playing
-      setTimeout(() => setStatus("playing"), 3000);
+      const characters = await fetchCharacters(Math.floor(Math.random() * 5) + 1, 6);
+      initGame(characters);  // solo inicializa, status queda en 'idle'
     } catch {
-      setError("No pudimos cargar los personajes. ¿Reintentamos?");
+      setError('No pudimos cargar los personajes. ¿Reintentamos?');
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [initGame]);
 
   useEffect(() => {
     load();
-  }, []);
+  }, [load]);
 
-  return { isLoading, error, retry: load };
+  return { isLoading, error, startGame };
 };
