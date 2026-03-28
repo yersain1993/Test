@@ -9,7 +9,7 @@ interface UseCharactersReturn {
 }
 
 export const useCharacters = (): UseCharactersReturn => {
-  const [isLoading, setIsLoading] = useState(true);  // inicia cargando
+  const [isLoading, setIsLoading] = useState(true); // inicia cargando
   const [error, setError] = useState<string | null>(null);
   const initGame = useGameStore((s) => s.initGame);
   const startGame = useGameStore((s) => s.startGame);
@@ -18,8 +18,11 @@ export const useCharacters = (): UseCharactersReturn => {
     setIsLoading(true);
     setError(null);
     try {
-      const characters = await fetchCharacters(Math.floor(Math.random() * 5) + 1, 6);
-      initGame(characters);  // solo inicializa, status queda en 'idle'
+      const characters = await fetchCharacters(
+        Math.floor(Math.random() * 5) + 1,
+        6
+      );
+      initGame(characters); // solo inicializa, status queda en 'idle'
     } catch {
       setError('No pudimos cargar los personajes. ¿Reintentamos?');
     } finally {

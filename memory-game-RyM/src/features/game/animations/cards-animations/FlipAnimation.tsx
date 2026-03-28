@@ -1,7 +1,10 @@
-import * as React from "react"
-import { motion } from "framer-motion"
-import { flipVariants, flipTransition } from "@/features/game/animations/cards-animations/presets"
-import { mergeClassNames } from "@/shared/utils"
+import * as React from 'react';
+import { motion } from 'framer-motion';
+import {
+  flipVariants,
+  flipTransition,
+} from '@/features/game/animations/cards-animations/presets';
+import { mergeClassNames } from '@/shared/utils';
 
 const FlipCard = React.forwardRef<
   HTMLDivElement,
@@ -10,28 +13,28 @@ const FlipCard = React.forwardRef<
   return (
     <div
       ref={ref}
-      className={mergeClassNames("w-full h-full", className)}
-      style={{ perspective: "1000px" }}
+      className={mergeClassNames('h-full w-full', className)}
+      style={{ perspective: '1000px' }}
       {...props}
     >
       <motion.div
         initial="front"
-        animate={isFlipped ? "back" : "front"}
+        animate={isFlipped ? 'back' : 'front'}
         variants={flipVariants}
         transition={flipTransition}
-        className="relative w-full h-full"
+        className="relative h-full w-full"
         style={{
-          display: "grid",
+          display: 'grid',
           gridTemplateAreas: "'stack'",
-          transformStyle: "preserve-3d",
+          transformStyle: 'preserve-3d',
         }}
       >
         {children}
       </motion.div>
     </div>
-  )
-})
-FlipCard.displayName = "FlipCard"
+  );
+});
+FlipCard.displayName = 'FlipCard';
 
 const FlipCardFront = React.forwardRef<
   HTMLDivElement,
@@ -39,18 +42,18 @@ const FlipCardFront = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={mergeClassNames("w-full h-full", className)}
+    className={mergeClassNames('h-full w-full', className)}
     style={{
-      gridArea: "stack",
-      backfaceVisibility: "hidden",
-      WebkitBackfaceVisibility: "hidden",
-      transform: "rotateY(0deg) translateZ(1px)", 
+      gridArea: 'stack',
+      backfaceVisibility: 'hidden',
+      WebkitBackfaceVisibility: 'hidden',
+      transform: 'rotateY(0deg) translateZ(1px)',
       zIndex: 2,
     }}
     {...props}
   />
-))
-FlipCardFront.displayName = "FlipCardFront"
+));
+FlipCardFront.displayName = 'FlipCardFront';
 
 const FlipCardBack = React.forwardRef<
   HTMLDivElement,
@@ -58,17 +61,17 @@ const FlipCardBack = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={mergeClassNames("w-full h-full", className)}
+    className={mergeClassNames('h-full w-full', className)}
     style={{
-      gridArea: "stack",
-      backfaceVisibility: "hidden",
-      WebkitBackfaceVisibility: "hidden",
-      transform: "rotateY(180deg)",
-      zIndex: 1, 
+      gridArea: 'stack',
+      backfaceVisibility: 'hidden',
+      WebkitBackfaceVisibility: 'hidden',
+      transform: 'rotateY(180deg)',
+      zIndex: 1,
     }}
     {...props}
   />
-))
-FlipCardBack.displayName = "FlipCardBack"
+));
+FlipCardBack.displayName = 'FlipCardBack';
 
-export { FlipCard, FlipCardFront, FlipCardBack }
+export { FlipCard, FlipCardFront, FlipCardBack };

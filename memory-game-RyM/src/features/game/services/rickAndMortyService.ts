@@ -1,8 +1,8 @@
 // services/rickAndMortyService.ts
-import axios from "axios";
-import type { Character } from "@/features/game/types/character";
+import axios from 'axios';
+import type { Character } from '@/features/game/types/character';
 
-const GQL_URL = "https://rickandmortyapi.com/graphql";
+const GQL_URL = 'https://rickandmortyapi.com/graphql';
 
 const GET_CHARACTERS_QUERY = `
   query GetCharacters($page: Int!) {

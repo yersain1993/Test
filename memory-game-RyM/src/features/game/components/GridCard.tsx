@@ -14,7 +14,7 @@ export default function GridCard({ isLoading, startGame }: GridCardProps) {
   const cards = useGameStore((s) => s.cards);
   const status = useGameStore((s) => s.status);
 
-  const isPlayed = status === 'playing' ? "disabled" : "play";
+  const isPlayed = status === 'playing' ? 'disabled' : 'play';
 
   if (isLoading) {
     return (
@@ -31,13 +31,13 @@ export default function GridCard({ isLoading, startGame }: GridCardProps) {
 
   return (
     <section className="h-auto w-full">
-      <h2 className='font-bold text-[24px] text-start'>Personajes</h2>
+      <h2 className="text-start text-[24px] font-bold">Personajes</h2>
       <main className="grid grid-cols-1 justify-items-center gap-4 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4">
         {cards.map((card) => (
           <CharacterCard key={card.uid} card={card} />
         ))}
       </main>
-      <Button variant={isPlayed} className='mt-2' onClick={startGame}>
+      <Button variant={isPlayed} className="mt-2" onClick={startGame}>
         Inicio
       </Button>
     </section>

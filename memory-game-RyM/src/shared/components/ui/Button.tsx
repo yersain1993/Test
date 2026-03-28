@@ -1,7 +1,7 @@
 import type { ButtonHTMLAttributes } from 'react';
 import { mergeClassNames } from '@/shared/utils';
 
-type ButtonVariant = 'submit' | 'play' | 'home'  | 'disabled';
+type ButtonVariant = 'submit' | 'play' | 'home' | 'disabled';
 
 type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   isLoading?: boolean;
@@ -16,7 +16,8 @@ const variantStyles: Record<ButtonVariant, string> = {
     'border-[#1d8993] bg-[#21838d] text-[#f3f7f8] shadow-[0_6px_0_#c8df3f] hover:bg-[#1f7881] active:shadow-[0_4px_0_#c8df3f] focus-visible:ring-[#19a7b899]',
   play: 'border-[#D8E054] bg-[#A2F2F9] text-[#1d8993] shadow-[0_6px_0_#D8E054] hover:bg-[#8DE0E8] active:shadow-[0_4px_0_#D8E054] focus-visible:ring-[#A2F2F999]',
   home: 'border-[#A2F2F9] bg-[#D8E054] text-[#1d8993] shadow-[0_6px_0_#A2F2F9] hover:bg-[#C8D044] active:shadow-[0_4px_0_#A2F2F9] focus-visible:ring-[#D8E05499]',
-  disabled: 'border-[#1d8993] bg-[#21838d] text-[#f3f7f8] shadow-[0_6px_0_#c8df3f] opacity-70 cursor-not-allowed',
+  disabled:
+    'border-[#1d8993] bg-[#21838d] text-[#f3f7f8] shadow-[0_6px_0_#c8df3f] opacity-70 cursor-not-allowed',
 };
 
 const Button = ({

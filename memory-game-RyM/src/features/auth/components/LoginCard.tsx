@@ -125,7 +125,7 @@ const LoginCard = ({ onSuccess }: LoginCardProps) => {
           <Button
             disabled={isSubmitting}
             isLoading={isSubmitting}
-            className='w-full'
+            className="w-full"
             variant="submit"
           />
 

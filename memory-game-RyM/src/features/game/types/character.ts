@@ -17,4 +17,4 @@ export interface Card {
   isMatched: boolean;
 }
 
-export type GameStatus = "idle" | "preview" | "playing" | "finished";
+export type GameStatus = 'idle' | 'preview' | 'playing' | 'finished';
