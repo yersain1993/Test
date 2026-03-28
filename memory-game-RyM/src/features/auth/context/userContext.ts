@@ -6,15 +6,18 @@ import {
   useEffect,
   useState,
   type PropsWithChildren,
-} from "react";
+} from 'react';
 
-import type { LoginCredentials } from "@/features/auth/types/loginTypes";
-import type { LoginResult } from "@/features/auth/services/loginService";
-import { logoutSession, refreshSession } from "@/features/auth/services/authSessionService";
-import { loginWithCredentials } from "@/features/auth/services/loginService";
-import type { AuthUser } from "@/features/auth/types/loginTypes";
+import type { LoginCredentials } from '@/features/auth/types/loginTypes';
+import type { LoginResult } from '@/features/auth/services/loginService';
+import {
+  logoutSession,
+  refreshSession,
+} from '@/features/auth/services/authSessionService';
+import { loginWithCredentials } from '@/features/auth/services/loginService';
+import type { AuthUser } from '@/features/auth/types/loginTypes';
 
-const SESSION_MARKER_KEY = "auth.session.active";
+const SESSION_MARKER_KEY = 'auth.session.active';
 
 type UserContextValue = {
   user: AuthUser | null;
@@ -29,7 +32,7 @@ const defaultValue: UserContextValue = {
   user: null,
   isAuthenticated: false,
   isLoading: true,
-  login: async () => ({ ok: false, reason: "unknown_error" }),
+  login: async () => ({ ok: false, reason: 'unknown_error' }),
   logout: async () => {},
   bootstrapSession: async () => {},
 };
@@ -43,7 +46,7 @@ export const UserProvider = ({ children }: PropsWithChildren) => {
   const [isLoading, setIsLoading] = useState(true);
 
   const bootstrapSession = useCallback(async () => {
-    const hasPreviousSession = localStorage.getItem(SESSION_MARKER_KEY) === "1";
+    const hasPreviousSession = localStorage.getItem(SESSION_MARKER_KEY) === '1';
 
     if (!hasPreviousSession) {
       setUser(null);
@@ -66,16 +69,19 @@ export const UserProvider = ({ children }: PropsWithChildren) => {
     setIsLoading(false);
   }, []);
 
-  const login = useCallback(async (credentials: LoginCredentials): Promise<LoginResult> => {
-    const result = await loginWithCredentials(credentials);
+  const login = useCallback(
+    async (credentials: LoginCredentials): Promise<LoginResult> => {
+      const result = await loginWithCredentials(credentials);
 
-    if (result.ok) {
-      localStorage.setItem(SESSION_MARKER_KEY, "1");
-      setUser(result.data.user);
-    }
+      if (result.ok) {
+        localStorage.setItem(SESSION_MARKER_KEY, '1');
+        setUser(result.data.user);
+      }
 
-    return result;
-  }, []);
+      return result;
+    },
+    []
+  );
 
   const logout = useCallback(async () => {
     await logoutSession();
@@ -104,6 +110,3 @@ export const UserProvider = ({ children }: PropsWithChildren) => {
     children
   );
 };
-
-
- 

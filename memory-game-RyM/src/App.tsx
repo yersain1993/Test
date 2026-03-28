@@ -1,11 +1,11 @@
 import type { PropsWithChildren } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
-import LoginScreen from '@/features/auth/screens/LoginScreen';
-import RecoverPasswordScreen from '@/features/auth/screens/RecoverPasswordScreen';
-import RegisterScreen from '@/features/auth/screens/RegisterScreen';
-import GameScreen from '@/features/game/screens/GameScreen';
+import LoginPage from '@/features/auth/pages/LoginPage';
+import RegisterPage from '@/features/auth/pages/RegisterPage';
+import GamePage from '@/features/game/pages/GamePage';
 import Layout from '@/shared/components/ui/Layout';
-import { useAuth } from '@/shared/context/userContext';
+import { useAuth } from '@/features/auth/context/userContext';
+import { Loader } from 'lucide-react';
 
 const ProtectedRoute = ({ children }: PropsWithChildren) => {
   const { isAuthenticated, isLoading } = useAuth();
@@ -14,7 +14,7 @@ const ProtectedRoute = ({ children }: PropsWithChildren) => {
     return (
       <Layout>
         <div className="rounded-2xl border-2 border-[#1f3247] bg-[#FFFAC2] px-6 py-4 text-center font-bold text-[#2f3f56] shadow-[0_4px_0_#c8df3f]">
-          Cargando sesión...
+          <Loader/>
         </div>
       </Layout>
     );
@@ -33,8 +33,8 @@ const PublicRoute = ({ children }: PropsWithChildren) => {
   if (isLoading) {
     return (
       <Layout>
-        <div className="rounded-2xl border-2 border-[#1f3247] bg-[#FFFAC2] px-6 py-4 text-center font-bold text-[#2f3f56] shadow-[0_4px_0_#c8df3f]">
-          Cargando sesión...
+        <div className="rounded-2xl border-2 border-[#1f3247] bg-[#FFFAC2] px-6 py-4 font-bold shadow-[0_4px_0_#c8df3f]">
+          <Loader/>
         </div>
       </Layout>
     );
@@ -55,16 +55,15 @@ function App() {
         path="/login"
         element={
           <PublicRoute>
-            <LoginScreen />
+            <LoginPage />
           </PublicRoute>
         }
       />
-      <Route path="/recover-password" element={<RecoverPasswordScreen />} />
       <Route
         path="/register"
         element={
           <PublicRoute>
-            <RegisterScreen />
+            <RegisterPage />
           </PublicRoute>
         }
       />
@@ -72,7 +71,7 @@ function App() {
         path="/game"
         element={
           <ProtectedRoute>
-            <GameScreen />
+            <GamePage />
           </ProtectedRoute>
         }
       />
