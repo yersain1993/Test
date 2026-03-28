@@ -27,7 +27,6 @@ export default function GridCard({ isLoading, startGame }: GridCardProps) {
   if (status === 'finished') {
     return <GameOver />;
   }
-  console.log(status);
 
   return (
     <section className="h-auto w-full">
