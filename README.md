@@ -159,6 +159,42 @@ Usuario               LoginCard             useAuth/login         apiClient     
 
 ---
 
+## 9. Estrategia de Testing (Frontend `memory-game-RyM`)
+
+El frontend incorpora testing con **Vitest + React Testing Library** para cubrir la logica critica:
+
+- **Utilidades puras:** `buildShuffledCards` (duplicado de pares + shuffle Fisher-Yates).
+- **Store de juego (Zustand):** transiciones de estado, reglas de `flipCard`, turnos, matches y `resetGame`.
+- **Hook de juego:** `useCharacters` (flujo exitoso, error y delegacion de `startGame`).
+- **Servicio API:** `fetchCharacters` con mocks de Axios y validacion de transformacion de respuesta.
+- **Formulario de registro:** `RegisterCard` con validacion Zod, errores de backend y flujo exitoso.
+
+### Setup global de tests
+
+En `memory-game-RyM/vitest.setup.ts` se configuro:
+
+- `@testing-library/jest-dom`.
+- Limpieza del DOM tras cada test.
+- Limpieza/restauracion de mocks (`vi.clearAllMocks`, `vi.restoreAllMocks`).
+- Reset del estado global de `useGameStore` (Zustand) en cada test para evitar contaminacion entre suites.
+
+### Timers en pruebas
+
+- No se fuerzan timers falsos globalmente.
+- Solo las suites de juego usan `vi.useFakeTimers()` para avanzar los delays de 3s (preview) y 1s (evaluacion) sin esperar tiempo real.
+
+### Cobertura
+
+La cobertura esta focalizada en modulos criticos del frontend:
+
+- `src/features/game/utils/buildShuffleCards.ts`
+- `src/features/game/store/useGameStore.ts`
+- `src/features/game/hooks/useCharacters.ts`
+- `src/features/game/services/rickAndMortyService.ts`
+- `src/features/auth/components/RegisterCard.tsx`
+
+---
+
 # INSTRUCCIONES DE USO - Memory Game + Server Authenticator
 
 Guia rapida para ejecutar y usar el aplicativo completo.
@@ -227,7 +263,15 @@ npm install
 npm run dev
 ```
 
-4. Abrir la URL que muestre Vite (normalmente):
+4. (Opcional) Ejecutar tests del frontend:
+
+```bash
+npm run test
+npm run test:watch
+npm run test:coverage
+```
+
+5. Abrir la URL que muestre Vite (normalmente):
 
 ```text
 http://localhost:5173
