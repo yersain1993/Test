@@ -23,6 +23,10 @@ El proyecto permite:
 - Axios
 - Tailwind CSS v4
 - Framer Motion
+- Vitest
+- React Testing Library
+- Testing Library User Event
+- JSDOM
 
 ## Arquitectura de carpetas
 
@@ -96,7 +100,43 @@ npm run build    # build de produccion
 npm run preview  # vista previa del build
 npm run lint     # analisis estatico
 npm run format   # formateo con prettier
+npm run test     # ejecuta todos los tests con vitest
+npm run test:watch # ejecuta tests en modo watch
+npm run test:coverage # ejecuta tests con reporte de cobertura
 ```
+
+## Testing
+
+La suite usa **Vitest + React Testing Library** y esta orientada a la logica critica del proyecto:
+
+- Utilidades puras: `buildShuffledCards` (cobertura 100%).
+- Store de juego (Zustand): transiciones `idle -> preview -> playing -> finished`, reglas de `flipCard`, turnos, matches, reset y temporizadores.
+- Hook de carga: `useCharacters` (flujo exitoso, error y delegacion de `startGame`).
+- Servicio de API: `fetchCharacters` con mocks de Axios y validacion de transformacion de datos.
+- Formulario de registro: `RegisterCard` con validaciones Zod, errores de backend y flujo exitoso.
+
+### Setup global de tests
+
+`vitest.setup.ts` incluye:
+
+- `@testing-library/jest-dom` para matchers de UI.
+- Limpieza automatica del DOM en cada test.
+- Limpieza y restauracion de mocks (`vi.clearAllMocks`, `vi.restoreAllMocks`).
+- Reset del estado global de `useGameStore` (Zustand) en cada test para evitar contaminacion entre suites.
+
+### Timers en pruebas
+
+- El proyecto **no fuerza fake timers globales**.
+- Los tests de juego activan `vi.useFakeTimers()` solo en sus suites, para avanzar los delays (3s preview, 1s comparacion) sin esperar tiempo real.
+
+### Cobertura
+
+- La cobertura esta focalizada en modulos criticos:
+  - `src/features/game/utils/buildShuffleCards.ts`
+  - `src/features/game/store/useGameStore.ts`
+  - `src/features/game/hooks/useCharacters.ts`
+  - `src/features/game/services/rickAndMortyService.ts`
+  - `src/features/auth/components/RegisterCard.tsx`
 
 ## Ejecutar en local
 
