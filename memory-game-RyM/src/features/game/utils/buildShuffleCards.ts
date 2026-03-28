@@ -1,9 +1,27 @@
-import type { Card, Character } from "../types/character";
+import type { Card, Character } from '../types/character';
 
 export const buildShuffledCards = (characters: Character[]): Card[] => {
   const cards: Card[] = characters.flatMap((char) => [
-    { uid: `${char.id}_a`, characterId: char.id, name: char.name, image: char.image, status: char.status, species: char.species, isFlipped: false, isMatched: false },
-    { uid: `${char.id}_b`, characterId: char.id, name: char.name, image: char.image, status: char.status, species: char.species, isFlipped: false, isMatched: false },
+    {
+      uid: `${char.id}_a`,
+      characterId: char.id,
+      name: char.name,
+      image: char.image,
+      status: char.status,
+      species: char.species,
+      isFlipped: false,
+      isMatched: false,
+    },
+    {
+      uid: `${char.id}_b`,
+      characterId: char.id,
+      name: char.name,
+      image: char.image,
+      status: char.status,
+      species: char.species,
+      isFlipped: false,
+      isMatched: false,
+    },
   ]);
 
   // Fisher-Yates shuffle

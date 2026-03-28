@@ -8,7 +8,10 @@ export type RegisterResponse = {
   message?: string;
 };
 
-export type RegisterErrorReason = 'user_already_exists' | 'validation_error' | 'unknown_error';
+export type RegisterErrorReason =
+  | 'user_already_exists'
+  | 'validation_error'
+  | 'unknown_error';
 
 export type RegisterSuccess = {
   message: string;

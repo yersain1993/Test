@@ -6,7 +6,10 @@ import logo from '@/assets/logo.png';
 import Button from '@/shared/components/ui/Button';
 import PasswordVisibilityButton from '@/shared/components/ui/PasswordVisibilityButton';
 import { mergeClassNames } from '@/shared/utils';
-import { registerSchema, type RegisterFormValues } from '@/features/auth/schemas/registerSchema';
+import {
+  registerSchema,
+  type RegisterFormValues,
+} from '@/features/auth/schemas/registerSchema';
 import { registerUser } from '@/features/auth/services/registerService';
 import { buildFieldErrors } from '../utils/buildFieldError';
 
@@ -79,6 +82,8 @@ const RegisterCard = ({ onSuccess }: RegisterCardProps) => {
       confirmPassword: '',
     });
 
+    alert('Cuenta creada exitosamente. Ahora puedes iniciar sesion.');
+
     onSuccess?.();
   };
 
@@ -86,7 +91,7 @@ const RegisterCard = ({ onSuccess }: RegisterCardProps) => {
     'h-12 w-full rounded-xl border-[2.5px] border-[#26344b] bg-transparent px-4 text-base text-[#1f3247] transition outline-none placeholder:text-[#6a7790] focus:border-[#1f3247] focus:ring-4 focus:ring-[#19a7b84d] sm:h-13 sm:px-5 sm:text-lg';
 
   return (
-    <section className="w-full h-auto px-1 sm:px-0">
+    <section className="h-auto w-full px-1 sm:px-0">
       <div className="mx-auto flex w-full max-w-104 flex-col rounded-[28px] border-2 border-[#1f3247] bg-[#FFFAC2] px-5 py-6 shadow-[0_2px_0_#c8df3f] sm:max-w-md sm:px-7 sm:py-7 md:px-8 md:py-8">
         <div className="mb-5 flex flex-col items-center gap-2 text-center sm:mb-6">
           <img
@@ -99,7 +104,10 @@ const RegisterCard = ({ onSuccess }: RegisterCardProps) => {
           </h1>
         </div>
 
-        <form className="mx-auto w-full space-y-4 sm:space-y-5" onSubmit={handleSubmit(onSubmit)}>
+        <form
+          className="mx-auto w-full space-y-4 sm:space-y-5"
+          onSubmit={handleSubmit(onSubmit)}
+        >
           <label className="block space-y-2">
             <span className="block text-base font-bold text-[#2f3f56] sm:text-lg">
               Usuario

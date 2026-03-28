@@ -1,188 +1,162 @@
-# Software Design Document (SDD)
+﻿# Software Design Document (SDD)
 
 ## Memory Game - Rick and Morty
 
-**Versión:** 1.0
-**Fecha:** 2026-03-26
+Version: 1.1  
+Fecha: 2026-03-27
 
 ---
 
-## 1. Introducción
+## 1. Introduccion
 
-### 1.1 Propósito
+### 1.1 Proposito
 
-Este documento describe el diseño técnico del juego de memoria basado en personajes de Rick and Morty. Incluye la arquitectura, componentes, flujos de datos y decisiones de diseño.
+Definir el diseño tecnico del frontend `memory-game-RyM`: arquitectura, componentes, flujos, estado y dependencias.
 
 ### 1.2 Alcance
 
-Aplicación web SPA que permite a usuarios autenticados jugar un juego de memoria con cartas de personajes obtenidos de la API de Rick and Morty.
+Aplicacion SPA que implementa:
 
-### 1.3 Stack Tecnológico
+- Autenticacion de usuario (registro, login, refresh, logout).
+- Memory game con personajes de Rick and Morty.
+- Control de acceso a rutas protegidas.
 
-| Categoría     | Tecnología            |
-| ------------- | --------------------- |
-| Framework     | React 19              |
-| Lenguaje      | TypeScript            |
-| Bundler       | Vite 8                |
-| Estilos       | Tailwind CSS v4       |
-| Estado (Auth) | React Context         |
-| Estado (Game) | Zustand               |
-| Formularios   | react-hook-form + Zod |
-| Animaciones   | Framer Motion         |
-| HTTP Client   | Axios                 |
-| Routing       | React Router DOM      |
+### 1.3 Tecnologias
+
+| Categoria | Tecnologia |
+| --- | --- |
+| Framework UI | React 19 |
+| Lenguaje | TypeScript |
+| Build tool | Vite 8 |
+| Routing | React Router DOM 7 |
+| Formularios | React Hook Form + Zod |
+| Estado auth | React Context |
+| Estado juego | Zustand |
+| HTTP | Axios |
+| Estilos | Tailwind CSS v4 |
+| Animaciones | Framer Motion |
 
 ---
 
-## 2. Arquitectura del Sistema
+## 2. Arquitectura del sistema
 
-### 2.1 Diagrama de Alto Nivel
+### 2.1 Vista de alto nivel
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                        FRONTEND                             │
-│  ┌─────────────┐    ┌─────────────┐    ┌─────────────┐     │
-│  │    Auth     │    │    Game     │    │   Shared    │     │
-│  │   Module    │    │   Module    │    │   Module    │     │
-│  └──────┬──────┘    └──────┬──────┘    └──────┬──────┘     │
-│         │                  │                  │             │
-│         └──────────────────┼──────────────────┘             │
-│                            │                                │
-│              ┌─────────────┴─────────────┐                  │
-│              │      State Management     │                  │
-│              │  (Context + Zustand)      │                  │
-│              └─────────────┬─────────────┘                  │
-└────────────────────────────┼────────────────────────────────┘
-                             │
-         ┌───────────────────┼───────────────────┐
-         │                   │                   │
-         ▼                   ▼                   ▼
-┌─────────────────┐ ┌─────────────────┐ ┌─────────────────┐
-│   Auth Backend  │ │ Rick & Morty    │ │   LocalStorage  │
-│   (REST API)    │ │ GraphQL API     │ │   (Session)     │
-│   :8000/api     │ │                 │ │                 │
-└─────────────────┘ └─────────────────┘ └─────────────────┘
-```
+- Capa de presentacion: componentes y paginas React.
+- Capa de estado:
+- `UserContext` para autenticacion.
+- `useGameStore` (Zustand) para estado del juego.
+- Capa de datos:
+- Backend auth via REST (`/auth/*`).
+- Rick and Morty API via GraphQL.
 
-### 2.2 Estructura de Directorios
+### 2.2 Estructura de modulos
 
-```
+```text
 src/
-├── features/
-│   ├── auth/                    # Módulo de autenticación
-│   │   ├── api/                 # apiClient (Axios)
-│   │   ├── components/          # LoginCard, RegisterCard
-│   │   ├── pages/               # LoginPage, RegisterPage
-│   │   ├── services/            # login(), register(), session()
-│   │   ├── schemas/             # Zod schemas
-│   │   ├── types/               # User, Credentials
-│   │   └── utils/               # handleAuthError()
-│   │
-│   └── game/                    # Módulo del juego
-│       ├── animations/          # FlipAnimation
-│       ├── components/          # CharacterCard, GridCard
-│       ├── hooks/               # useCharacters
-│       ├── pages/               # GamePage
-│       ├── services/            # fetchCharacters()
-│       ├── store/               # useGameStore
-│       ├── types/               # Character, Card, GameStatus
-│       └── utils/               # shuffleCards()
-│
-└── shared/
-    ├── components/ui/           # Button, Layout
-    ├── context/                 # UserProvider
-    └── utils/                   # mergeClassNames()
+  features/
+    auth/
+      api/axiosInstance.ts
+      context/userContext.ts
+      services/{loginService,registerService,authSessionService}.ts
+      components/{LoginCard,RegisterCard}.tsx
+      pages/{LoginPage,RegisterPage}.tsx
+      schemas/registerSchema.ts
+      types/
+      utils/
+    game/
+      store/useGameStore.ts
+      hooks/useCharacters.ts
+      services/rickAndMortyService.ts
+      components/{GridCard,GameOver,game-card/*}.tsx
+      animations/cards-animations/*
+      utils/buildShuffleCards.ts
+      types/character.ts
+  shared/
+    components/ui/{Layout,Button,Loader,PasswordVisibilityButton}.tsx
+    utils/{mergeClassNames,index}.ts
 ```
+
+### 2.3 Enrutamiento
+
+Definido en `src/App.tsx`.
+
+| Ruta | Tipo | Comportamiento |
+| --- | --- | --- |
+| `/` | Redirect | Redirige a `/game` |
+| `/login` | Publica | Si autenticado, redirige a `/game` |
+| `/register` | Publica | Si autenticado, redirige a `/game` |
+| `/game` | Protegida | Si no autenticado, redirige a `/login` |
+| `*` | Fallback | Redirige a `/login` |
 
 ---
 
-## 3. Diseño de Componentes
+## 3. Diseño de autenticacion
 
-### 3.1 Módulo de Autenticación
+### 3.1 Contexto de usuario
 
-#### 3.1.1 UserContext
+Archivo: `src/features/auth/context/userContext.ts`
 
-Gestiona el estado global de autenticación.
+Contrato principal:
 
-```typescript
-interface UserContextValue {
-  user: User | null;
+```ts
+type UserContextValue = {
+  user: AuthUser | null;
+  isAuthenticated: boolean;
   isLoading: boolean;
-  login: (credentials: Credentials) => Promise<Result>;
+  login: (credentials: LoginCredentials) => Promise<LoginResult>;
   logout: () => Promise<void>;
-  register: (data: RegisterData) => Promise<Result>;
-}
+  bootstrapSession: () => Promise<void>;
+};
 ```
 
-**Flujo de sesión:**
+Responsabilidades:
 
-1. Al montar `UserProvider`, verifica marcador en localStorage
-2. Si existe, hace request a `/session` para validar cookie HTTP-only
-3. Actualiza estado `user` según respuesta
+- Gestionar usuario autenticado en memoria.
+- Exponer `isAuthenticated` y `isLoading` para guards de ruta.
+- Rehidratar sesion al cargar la aplicacion.
+- Limpiar estado al cerrar sesion.
 
-#### 3.1.2 Servicios de Auth
+### 3.2 Persistencia de sesion
 
-| Servicio       | Endpoint         | Método | Descripción                     |
-| -------------- | ---------------- | ------ | ------------------------------- |
-| `login()`      | `/auth/login`    | POST   | Autentica usuario, setea cookie |
-| `register()`   | `/auth/register` | POST   | Crea cuenta nueva               |
-| `getSession()` | `/auth/session`  | GET    | Valida sesión actual            |
-| `logout()`     | `/auth/logout`   | POST   | Invalida sesión                 |
+- No se guardan tokens en frontend.
+- Se usa marcador local: `auth.session.active` (valor `1`).
+- Si existe el marcador al iniciar:
+- Se llama `POST /auth/refresh`.
+- Si devuelve usuario, se mantiene sesion.
+- Si falla, se elimina marcador y se limpia usuario.
 
-**Patrón Result:**
+### 3.3 Servicios de auth
 
-```typescript
-type Result<T> = { ok: true; data: T } | { ok: false; reason: string };
-```
+| Servicio | Endpoint | Metodo | Resultado |
+| --- | --- | --- | --- |
+| `loginWithCredentials` | `/auth/login` | POST | `LoginResult` |
+| `registerUser` | `/auth/register` | POST | `RegisterResult` |
+| `refreshSession` | `/auth/refresh` | POST | `AuthUser | undefined` |
+| `logoutSession` | `/auth/logout` | POST | `void` |
 
-### 3.2 Módulo del Juego
+Cliente HTTP:
 
-#### 3.2.1 Game Store (Zustand)
+- `apiClient` con `baseURL = VITE_API_BASE_URL`.
+- `withCredentials: true` habilitado para cookies.
 
-```typescript
-interface GameState {
-  cards: Card[];
-  flippedCards: number[];
-  matchedPairs: number[];
-  turns: number;
-  status: GameStatus;
+### 3.4 Validacion de formularios
 
-  // Actions
-  initGame: (characters: Character[]) => void;
-  flipCard: (index: number) => void;
-  checkMatch: () => void;
-  resetGame: () => void;
-}
+- Login: validacion basica con `react-hook-form`.
+- Register: `registerSchema` (Zod) con reglas:
+- email valido.
+- password minimo 8 caracteres.
+- confirmacion igual a password.
 
-type GameStatus = 'idle' | 'preview' | 'playing' | 'finished';
-```
+---
 
-#### 3.2.2 Ciclo de Vida del Juego
+## 4. Diseño del juego
 
-```
-┌─────────┐   initGame()   ┌─────────┐   3s timeout   ┌─────────┐
-│  idle   │ ─────────────► │ preview │ ─────────────► │ playing │
-└─────────┘                └─────────┘                └────┬────┘
-                                                          │
-     ┌────────────────────────────────────────────────────┤
-     │                                                    │
-     │  flipCard() → checkMatch()                         │
-     │  ┌─────────────────────────────────┐               │
-     │  │ match: remove cards, +aciertos  │               │
-     │  │ no match: flip back after 1s    │               │
-     │  │ +1 turn                         │               │
-     │  └─────────────────────────────────┘               │
-     │                                                    │
-     │         all pairs matched                          │
-     │                                                    ▼
-     │                                            ┌──────────┐
-     └───────────────────────────────────────────►│ finished │
-                                                  └──────────┘
-```
+### 4.1 Modelo de datos
 
-#### 3.2.3 Tipos de Datos
+Archivo: `src/features/game/types/character.ts`
 
-```typescript
+```ts
 interface Character {
   id: string;
   name: string;
@@ -192,161 +166,159 @@ interface Character {
 }
 
 interface Card {
-  id: string;
+  uid: string;
   characterId: string;
-  character: Character;
+  name: string;
+  image: string;
+  status: string;
+  species: string;
   isFlipped: boolean;
   isMatched: boolean;
 }
+
+type GameStatus = 'idle' | 'preview' | 'playing' | 'finished';
 ```
 
-#### 3.2.4 Servicio Rick and Morty API
+### 4.2 Estado global del juego
 
-```typescript
-// GraphQL Query
-const GET_CHARACTERS_QUERY = `
-  query GetCharacters($page: Int!) {
-    characters(page: $page) {
-      results { id, name, image, status, species }
-    }
-  }
-`;
+Archivo: `src/features/game/store/useGameStore.ts`
 
-// Endpoint: https://rickandmortyapi.com/graphql
-const fetchCharacters = async (page: number, limit: number): Promise<Character[]>
-```
+Estado:
 
-### 3.3 Componentes UI Compartidos
+- `characters`, `cards`, `flippedCards`
+- `turns`, `matches`, `status`
 
-#### 3.3.1 Button
+Acciones:
 
-| Prop        | Tipo                           | Default    | Descripción     |
-| ----------- | ------------------------------ | ---------- | --------------- |
-| `variant`   | `'submit' \| 'play' \| 'home'` | `'submit'` | Estilo visual   |
-| `isLoading` | `boolean`                      | `false`    | Estado de carga |
+- `initGame(characters)`
+- `startGame()`
+- `flipCard(uid)`
+- `resetGame()`
+- `setStatus(status)`
 
-**Variantes de color:**
+Reglas implementadas:
 
-| Variante | Background | Border  | Shadow  |
-| -------- | ---------- | ------- | ------- |
-| submit   | #21838d    | #1d8993 | #c8df3f |
-| play     | #A2F2F9    | #D8E054 | #D8E054 |
-| home     | #D8E054    | #A2F2F9 | #A2F2F9 |
+- Solo se permite voltear cartas en estado `playing`.
+- Maximo 2 cartas activas en `flippedCards`.
+- Comparacion por `characterId`.
+- Resolucion de turno a 1 segundo (match/no match).
+- Fin de juego cuando `matches === cards.length / 2`.
+
+### 4.3 Ciclo de vida
+
+1. `useCharacters` obtiene personajes y ejecuta `initGame`.
+2. Usuario pulsa boton de inicio y se ejecuta `startGame`.
+3. Estado pasa a `preview` por 3 segundos.
+4. Estado pasa a `playing`.
+5. Usuario juega turnos hasta `finished`.
+6. En `finished`, UI muestra `GameOver` con opciones:
+- `Repetir` (`resetGame`).
+- `Inicio` (`logout`).
+
+### 4.4 Carga de personajes
+
+Archivo: `src/features/game/services/rickAndMortyService.ts`
+
+- Endpoint GraphQL: `https://rickandmortyapi.com/graphql`
+- Query `GetCharacters(page)`.
+- Se extraen personajes y se aplica `slice(0, limit)`.
+- `useCharacters` solicita `limit = 6` y `page` aleatoria entre 1 y 5.
+
+### 4.5 Mezcla de cartas
+
+Archivo: `src/features/game/utils/buildShuffleCards.ts`
+
+- Duplica cada personaje en dos cartas (`_a`, `_b`).
+- Aplica algoritmo Fisher-Yates para orden aleatorio.
 
 ---
 
-## 4. Flujos de Datos
+## 5. Componentes UI clave
 
-### 4.1 Flujo de Login
+### 5.1 Layout
 
-```
-Usuario                LoginCard              loginService           apiClient            Backend
-   │                       │                       │                     │                   │
-   │──── email/pass ──────►│                       │                     │                   │
-   │                       │──── login() ─────────►│                     │                   │
-   │                       │                       │─── POST /login ────►│                   │
-   │                       │                       │                     │────── auth ──────►│
-   │                       │                       │                     │◄─── Set-Cookie ───│
-   │                       │                       │◄── { ok, data } ────│                   │
-   │                       │◄── Result ────────────│                     │                   │
-   │                       │                       │                     │                   │
-   │                       │─── setUser() ────────►│ UserContext         │                   │
-   │                       │─── navigate('/game')  │                     │                   │
-   │◄── redirect ──────────│                       │                     │                   │
-```
+- Wrapper visual global.
+- Muestra header solo si `isAuthenticated` es verdadero.
 
-### 4.2 Flujo del Juego
+### 5.2 Button
 
-```
-GamePage              useCharacters          useGameStore              UI
-   │                       │                     │                     │
-   │── mount ─────────────►│                     │                     │
-   │                       │── fetchCharacters() │                     │
-   │                       │◄── characters[] ────│                     │
-   │                       │                     │                     │
-   │── initGame(chars) ───►│                     │                     │
-   │                       │                     │── shuffle & dup ────│
-   │                       │                     │── status: preview ──│
-   │                       │                     │                     │── show cards 3s
-   │                       │                     │                     │
-   │                       │                     │── status: playing ──│
-   │                       │                     │                     │── hide cards
-   │                       │                     │                     │
-   │◄───────────────────── user click ───────────│                     │
-   │── flipCard(idx) ─────►│                     │                     │
-   │                       │                     │── flippedCards[] ───│
-   │                       │                     │                     │── animate flip
-   │                       │                     │                     │
-   │── checkMatch() ──────►│ (when 2 flipped)    │                     │
-   │                       │                     │── compare cards ────│
-   │                       │                     │── update state ─────│
-   │                       │                     │── turns++ ──────────│
-```
+Variantes soportadas:
+
+- `submit`
+- `play`
+- `home`
+- `disabled`
+
+Propiedades destacadas:
+
+- `isLoading`
+- `disabled`
+- `variant`
+
+### 5.3 GridCard
+
+- Renderiza estado de carga (`Loader`), tablero o pantalla final (`GameOver`).
+- Usa store de juego para `cards` y `status`.
 
 ---
 
-## 5. Reglas de Negocio
+## 6. Flujos
 
-### 5.1 Inicio del Juego
+### 6.1 Login
 
-- Las cartas se barajan aleatoriamente al comenzar
-- Todas las cartas se muestran por **3 segundos** (preview)
-- Después del preview, las cartas se voltean boca abajo
+1. Usuario completa formulario en `LoginCard`.
+2. `useAuth().login()` llama `loginWithCredentials`.
+3. Si es exitoso:
+- Guarda `auth.session.active=1`.
+- Actualiza `user` en contexto.
+- Navega a `/game`.
+4. Si falla, muestra mensaje de error en UI.
 
-### 5.2 Mecánica de Juego
+### 6.2 Registro
 
-- El jugador selecciona **2 cartas** por turno
-- **Match:** Mostrar 1 segundo → eliminar cartas → +1 acierto
-- **No match:** Mostrar 1 segundo → voltear boca abajo
-- Cada intento de par incrementa el contador de turnos
+1. Usuario completa `RegisterCard`.
+2. Se valida con Zod.
+3. `registerUser` llama `POST /auth/register`.
+4. Si es exitoso, muestra confirmacion y navega a `/login`.
 
-### 5.3 Fin del Juego
+### 6.3 Bootstrap de sesion
 
-- El juego termina cuando se encuentran todos los pares
-- Se muestra mensaje con total de turnos
-- Opciones: **Repetir** (reinicia) o **Inicio** (va a home)
-
----
-
-## 6. Routing y Navegación
-
-| Ruta                | Componente          | Acceso    | Redirect si...               |
-| ------------------- | ------------------- | --------- | ---------------------------- |
-| `/login`            | LoginPage           | Público   | → `/game` si autenticado     |
-| `/register`         | RegisterPage        | Público   | → `/game` si autenticado     |
-| `/recover-password` | RecoverPasswordPage | Público   | -                            |
-| `/game`             | GamePage            | Protegido | → `/login` si no autenticado |
+1. `UserProvider` se monta en `main.tsx`.
+2. Ejecuta `bootstrapSession()`.
+3. Si existe marcador local, llama refresh.
+4. Actualiza estado de autenticacion y carga.
 
 ---
 
-## 7. Variables de Entorno
+## 7. Seguridad
 
-| Variable            | Descripción                  | Default                     |
-| ------------------- | ---------------------------- | --------------------------- |
-| `VITE_API_BASE_URL` | URL base del backend de auth | `http://localhost:8000/api` |
-
----
-
-## 8. Dependencias Externas
-
-### 8.1 Rick and Morty API
-
-- **Tipo:** GraphQL
-- **Endpoint:** `https://rickandmortyapi.com/graphql`
-- **Rate Limit:** Sin autenticación requerida
-- **Datos:** Personajes con id, nombre, imagen, status, especie
-
-### 8.2 Backend de Autenticación
-
-- **Tipo:** REST API
-- **Auth:** Cookies HTTP-only
-- **CORS:** Requiere `withCredentials: true`
+- Tokens solo en cookies `httpOnly`.
+- Frontend nunca persiste tokens.
+- Validaciones de formulario del lado cliente (Zod) como primera barrera UX.
+- El estado local solo guarda un flag de existencia de sesion previa.
 
 ---
 
-## 9. Consideraciones de Seguridad
+## 8. Configuracion
 
-- Autenticación basada en cookies HTTP-only (no expuestas a JS)
-- Validación de formularios con Zod en cliente
-- Marcador de sesión en localStorage solo como flag, no contiene datos sensibles
-- CORS configurado para endpoints específicos
+### 8.1 Variable de entorno
+
+| Variable | Uso | Default |
+| --- | --- | --- |
+| `VITE_API_BASE_URL` | Base URL del backend auth | `http://localhost:8000/api` |
+
+### 8.2 Scripts del proyecto
+
+- `npm run dev`
+- `npm run build`
+- `npm run preview`
+- `npm run lint`
+- `npm run format`
+
+---
+
+## 9. Riesgos y mejoras sugeridas
+
+- El store usa `setTimeout`; podria centralizarse la limpieza en un mecanismo cancelable para evitar efectos colgantes en escenarios de desmontaje.
+- En `GridCard` existe un `console.log(status)` que conviene retirar para produccion.
+- Faltan pruebas unitarias/integracion en auth y game store.
