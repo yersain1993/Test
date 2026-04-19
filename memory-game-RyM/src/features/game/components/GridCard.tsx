@@ -36,7 +36,7 @@ export default function GridCard({ isLoading, startGame }: GridCardProps) {
           <CharacterCard key={card.uid} card={card} />
         ))}
       </main>
-      <Button variant={isPlayed} className="mt-2" onClick={startGame}>
+      <Button variant={isPlayed} className="mt-2" onClick={isPlayed === 'disabled' ? undefined : startGame}>
         Inicio
       </Button>
     </section>

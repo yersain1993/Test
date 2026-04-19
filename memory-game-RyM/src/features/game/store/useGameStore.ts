@@ -9,6 +9,7 @@ interface GameState {
   turns: number;
   matches: number;
   status: GameStatus;
+  currentGameId: string;
 
   initGame: (characters: Character[]) => void;
   startGame: () => void;
@@ -24,8 +25,10 @@ export const useGameStore = create<GameState>((set, get) => ({
   turns: 0,
   matches: 0,
   status: 'idle',
+  currentGameId: '',
 
   initGame: (characters) => {
+
     set({
       characters,
       cards: buildShuffledCards(characters),
@@ -33,6 +36,7 @@ export const useGameStore = create<GameState>((set, get) => ({
       turns: 0,
       matches: 0,
       status: 'idle',
+      currentGameId: crypto.randomUUID(),
     });
   },
 
@@ -92,6 +96,7 @@ export const useGameStore = create<GameState>((set, get) => ({
       turns: 0,
       matches: 0,
       status: 'idle',
+      currentGameId: crypto.randomUUID(),
     });
   },
 

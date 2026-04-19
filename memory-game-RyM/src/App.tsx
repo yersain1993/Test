@@ -1,4 +1,4 @@
-import type { PropsWithChildren } from 'react';
+import { useEffect, type PropsWithChildren } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import LoginPage from '@/features/auth/pages/LoginPage';
 import RegisterPage from '@/features/auth/pages/RegisterPage';
@@ -6,6 +6,7 @@ import GamePage from '@/features/game/pages/GamePage';
 import Layout from '@/shared/components/ui/Layout';
 import { useAuth } from '@/features/auth/context/userContext';
 import { Loader } from 'lucide-react';
+import { useScoreboardStore } from './features/scoreboard/store/useScoreboardStore';
 
 const ProtectedRoute = ({ children }: PropsWithChildren) => {
   const { isAuthenticated, isLoading } = useAuth();
@@ -48,6 +49,13 @@ const PublicRoute = ({ children }: PropsWithChildren) => {
 };
 
 function App() {
+
+  const hydrateScores = useScoreboardStore((s) => s.hydrateScores);
+
+  useEffect(() => {
+      hydrateScores();
+  }, []);
+
   return (
     <Routes>
       <Route path="/" element={<Navigate to="/game" replace />} />
