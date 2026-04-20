@@ -3,6 +3,8 @@ import { useGameStore } from '../store/useGameStore';
 import CharacterCard from './game-card/CharacterCard';
 import GameOver from './GameOver';
 import Loader from '../../../shared/components/ui/Loader';
+import { GAME_TIME } from '../config/time';
+import TimeOut from './TimeOut';
 
 type GridCardProps = {
   isLoading: boolean;
@@ -13,8 +15,19 @@ type GridCardProps = {
 export default function GridCard({ isLoading, startGame }: GridCardProps) {
   const cards = useGameStore((s) => s.cards);
   const status = useGameStore((s) => s.status);
+  const elapsedTime = useGameStore((s) => s.elapsedTime);
+  const isTimeOver = useGameStore((s) => s.isTimeOver);
+
+  const timmer = useGameStore((s) => s.timmer);
 
   const isPlayed = status === 'playing' ? 'disabled' : 'play';
+
+  const initialTime = GAME_TIME.EASY; // Aquí podrías obtener la dificultad seleccionada por el usuario
+
+  const handleStartGame = () => {
+    startGame();
+    timmer(initialTime);
+  };
 
   if (isLoading) {
     return (
@@ -24,19 +37,28 @@ export default function GridCard({ isLoading, startGame }: GridCardProps) {
     );
   }
 
-  if (status === 'finished') {
+  if (status === 'finished' && !isTimeOver) {
     return <GameOver />;
+  }
+
+  if (isTimeOver) {
+    return <TimeOut />;
   }
 
   return (
     <section className="h-auto w-full">
-      <h2 className="text-start text-[24px] font-bold">Personajes</h2>
+      <div className='flex'>
+        <h2 className="text-start text-[24px] font-bold">Personajes</h2>
+        <p>
+          Tiempo transcurrido: {elapsedTime} segundos de {initialTime}
+        </p>
+      </div>
       <main className="grid grid-cols-1 justify-items-center gap-4 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4">
         {cards.map((card) => (
           <CharacterCard key={card.uid} card={card} />
         ))}
       </main>
-      <Button variant={isPlayed} className="mt-2" onClick={startGame}>
+      <Button variant={isPlayed} className="mt-2" onClick={isPlayed === 'disabled' ? undefined : handleStartGame}>
         Inicio
       </Button>
     </section>
