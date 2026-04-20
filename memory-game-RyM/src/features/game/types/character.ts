@@ -18,3 +18,11 @@ export interface Card {
 }
 
 export type GameStatus = 'idle' | 'preview' | 'playing' | 'finished';
+
+export type Difficulty = 'easy' | 'medium' | 'hard';
+
+export const DIFFICULTY_CARD_LIMIT: Record<Difficulty, number> = {
+  easy: 6,
+  medium: 8,
+  hard: 10,
+};
