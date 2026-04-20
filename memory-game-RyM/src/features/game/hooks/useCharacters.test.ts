@@ -1,4 +1,4 @@
-import { renderHook, waitFor } from '@testing-library/react';
+import { act, renderHook, waitFor } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { useCharacters } from './useCharacters';
 import type { Character } from '../types/character';
@@ -30,7 +30,7 @@ const characters: Character[] = [
 ];
 
 describe('useCharacters', () => {
-  it('loads characters successfully and initializes the game', async () => {
+  it('loads easy difficulty by default and initializes the game', async () => {
     vi.spyOn(Math, 'random').mockReturnValue(0);
     fetchCharactersMock.mockResolvedValueOnce(characters);
 
@@ -42,9 +42,31 @@ describe('useCharacters', () => {
       expect(result.current.isLoading).toBe(false);
     });
 
+    expect(result.current.difficulty).toBe('easy');
     expect(fetchCharactersMock).toHaveBeenCalledWith(1, 6);
     expect(initGameMock).toHaveBeenCalledWith(characters);
     expect(result.current.error).toBeNull();
+  });
+
+  it('reloads characters with medium limit when difficulty changes', async () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0);
+    fetchCharactersMock.mockResolvedValue(characters);
+
+    const { result } = renderHook(() => useCharacters());
+
+    await waitFor(() => {
+      expect(result.current.isLoading).toBe(false);
+    });
+
+    act(() => {
+      result.current.setDifficulty('medium');
+    });
+
+    await waitFor(() => {
+      expect(fetchCharactersMock).toHaveBeenLastCalledWith(1, 8);
+    });
+
+    expect(result.current.difficulty).toBe('medium');
   });
 
   it('sets an error when loading characters fails', async () => {
